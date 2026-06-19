@@ -99,11 +99,11 @@ const ShelfPage: React.FC = () => {
       <View className={styles.section}>
         <View className={styles.sectionHeader}>
           <Text className={styles.sectionTitle}>我的书架</Text>
-          <Text className={styles.sectionMore}>{books.length}本</Text>
+          <Text className={styles.sectionMore}>{shelfBooks.length}本</Text>
         </View>
-        {books.length > 0 ? (
+        {shelfBooks.length > 0 ? (
           <View className={styles.bookList}>
-            {books.map(book => (
+            {shelfBooks.map(book => (
               <BookCard
                 key={book.id}
                 book={book}

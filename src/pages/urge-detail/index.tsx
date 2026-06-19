@@ -1,8 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, Image, Button } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
-import { getUrgeParticipants } from '@/data/urges';
 import { updateTypeMap } from '@/types';
 import { useAppStore } from '@/store/useAppStore';
 import type { UrgeTask, UrgeParticipant } from '@/types';
@@ -13,12 +12,8 @@ const UrgeDetailPage: React.FC = () => {
   const taskId = router.params.id || '1';
 
   const task = useAppStore(state => state.urgeTasks.find(t => t.id === taskId)) as UrgeTask;
+  const participants = useAppStore(state => state.getUrgeParticipants(taskId));
   const { joinUrge } = useAppStore();
-  const [participants, setParticipants] = useState<UrgeParticipant[]>([]);
-
-  React.useEffect(() => {
-    setParticipants(getUrgeParticipants(taskId));
-  }, [taskId]);
 
   const handleJoin = useCallback(() => {
     if (!task || task.status !== 'active' || task.hasJoined) return;
@@ -105,7 +100,7 @@ const UrgeDetailPage: React.FC = () => {
 
         <View className={styles.participantsCard}>
           <Text className={styles.sectionTitle}>
-            👥 参与催更的书友 ({participants.length})
+            👥 参与催更的书友 ({task?.currentCount || 0})
           </Text>
           <View className={styles.participantList}>
             {participants.map(p => (

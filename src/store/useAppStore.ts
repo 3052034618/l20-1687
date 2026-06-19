@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import type { Book, UrgeTask, AuthorResponse, BookClub } from '@/types';
-import { mockBooks, mockUrgeTasks, mockResponses, mockBookClubs } from '@/data';
+import { persist } from 'zustand/middleware';
+import type { Book, UrgeTask, AuthorResponse, BookClub, UrgeParticipant } from '@/types';
+import { mockBooks, mockUrgeTasks, mockResponses, mockBookClubs, mockParticipants } from '@/data';
 
 interface AppState {
   books: Book[];
@@ -8,6 +9,7 @@ interface AppState {
   responses: AuthorResponse[];
   bookClubs: BookClub[];
   clubBooks: Record<string, string[]>;
+  urgeParticipants: Record<string, UrgeParticipant[]>;
 
   toggleShelf: (bookId: string) => void;
   updateChapter: (bookId: string, chapter: number) => void;
@@ -21,17 +23,29 @@ interface AppState {
   getShelfBooks: () => Book[];
   getClubBooks: (clubId: string) => Book[];
   getJoinedClubs: () => BookClub[];
+  getUrgeParticipants: (taskId: string) => UrgeParticipant[];
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
-  books: [...mockBooks],
-  urgeTasks: [...mockUrgeTasks],
-  responses: [...mockResponses],
-  bookClubs: [...mockBookClubs],
-  clubBooks: {
-    '1': ['2'],
-    '2': ['1']
-  },
+const initialParticipants: Record<string, UrgeParticipant[]> = {};
+mockParticipants.forEach(p => {
+  if (!initialParticipants[p.taskId]) {
+    initialParticipants[p.taskId] = [];
+  }
+  initialParticipants[p.taskId].push(p);
+});
+
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      books: [...mockBooks],
+      urgeTasks: [...mockUrgeTasks],
+      responses: [...mockResponses],
+      bookClubs: [...mockBookClubs],
+      clubBooks: {
+        '1': ['2'],
+        '2': ['1']
+      },
+      urgeParticipants: initialParticipants,
 
   toggleShelf: (bookId: string) => {
     console.log('[Store] toggleShelf:', bookId);
@@ -71,20 +85,49 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   joinUrge: (taskId: string) => {
     console.log('[Store] joinUrge:', taskId);
-    set(state => ({
-      urgeTasks: state.urgeTasks.map(task => {
-        if (task.id !== taskId || task.status !== 'active' || task.hasJoined) {
-          return task;
-        }
-        const newCount = task.currentCount + 1;
-        return {
-          ...task,
-          hasJoined: true,
-          currentCount: newCount,
-          status: newCount >= task.targetCount ? 'completed' : task.status
-        };
-      })
-    }));
+    set(state => {
+      const newParticipants = { ...state.urgeParticipants };
+      if (!newParticipants[taskId]) {
+        newParticipants[taskId] = [];
+      }
+      
+      const task = state.urgeTasks.find(t => t.id === taskId);
+      if (!task || task.status !== 'active' || task.hasJoined) {
+        return state;
+      }
+
+      const newCount = task.currentCount + 1;
+      
+      const newParticipant: UrgeParticipant = {
+        id: Date.now().toString(),
+        taskId,
+        userId: 'me',
+        userName: '我',
+        userAvatar: 'https://picsum.photos/id/64/200/200',
+        joinedAt: new Date().toLocaleString('zh-CN', {
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace(/\//g, '-'),
+        message: '催更+1'
+      };
+
+      newParticipants[taskId] = [newParticipant, ...newParticipants[taskId]];
+
+      return {
+        urgeParticipants: newParticipants,
+        urgeTasks: state.urgeTasks.map(t => {
+          if (t.id !== taskId) return t;
+          return {
+            ...t,
+            hasJoined: true,
+            currentCount: newCount,
+            status: newCount >= t.targetCount ? 'completed' : t.status
+          };
+        })
+      };
+    });
   },
 
   createUrgeTask: (taskData) => {
@@ -152,5 +195,21 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   getJoinedClubs: () => {
     return get().bookClubs.filter(c => c.isJoined);
+  },
+
+  getUrgeParticipants: (taskId: string) => {
+    return get().urgeParticipants[taskId] || [];
   }
-}));
+}),
+    {
+      name: 'bookclub-app-storage-v2',
+      partialize: (state) => ({
+        books: state.books,
+        urgeTasks: state.urgeTasks,
+        responses: state.responses,
+        clubBooks: state.clubBooks,
+        urgeParticipants: state.urgeParticipants
+      })
+    }
+  )
+);

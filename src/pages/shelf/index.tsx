@@ -1,35 +1,34 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
-import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro';
+import Taro, { usePullDownRefresh } from '@tarojs/taro';
 import BookCard from '@/components/BookCard';
 import Empty from '@/components/Empty';
-import { getShelfBooks } from '@/data/books';
-import { getJoinedBookClubs } from '@/data/bookclubs';
-import type { Book, BookClub } from '@/types';
+import { useAppStore } from '@/store/useAppStore';
 import styles from './index.module.scss';
 
 const ShelfPage: React.FC = () => {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [bookClubs, setBookClubs] = useState<BookClub[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { getShelfBooks, getJoinedClubs, getClubBooks } = useAppStore();
+  const shelfBooks = useAppStore(state => state.books.filter(b => b.isInShelf));
+  const bookClubs = useAppStore(state => state.bookClubs.filter(c => c.isJoined));
+  const clubBooksMap = useAppStore(state => state.clubBooks);
 
-  const loadData = useCallback(() => {
+  const [loading, setLoading] = React.useState(false);
+
+  const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      setBooks(getShelfBooks());
-      setBookClubs(getJoinedBookClubs());
       setLoading(false);
       Taro.stopPullDownRefresh();
     }, 300);
   }, []);
 
-  useDidShow(() => {
-    loadData();
+  usePullDownRefresh(() => {
+    handleRefresh();
   });
 
-  usePullDownRefresh(() => {
-    loadData();
-  });
+  const getClubBooksCount = (clubId: string) => {
+    return (clubBooksMap[clubId] || []).length;
+  };
 
   const goToSearch = () => {
     Taro.navigateTo({
@@ -73,11 +72,11 @@ const ShelfPage: React.FC = () => {
                   />
                   <View className={styles.clubInfo}>
                     <Text className={styles.clubName}>{club.name}</Text>
-                    <Text className={styles.clubCount}>{club.memberCount}人 · {club.bookCount}本书</Text>
+                    <Text className={styles.clubCount}>{club.memberCount}人 · {getClubBooksCount(club.id)}本书</Text>
                   </View>
                 </View>
                 <View className={styles.clubBooks}>
-                  {books.slice(0, 3).map(book => (
+                  {getClubBooks(club.id).slice(0, 3).map(book => (
                     <Image
                       key={book.id}
                       className={styles.clubBookCover}
@@ -85,6 +84,11 @@ const ShelfPage: React.FC = () => {
                       mode="aspectFill"
                     />
                   ))}
+                  {getClubBooks(club.id).length === 0 && (
+                    <View className={styles.clubBooksEmpty}>
+                      <Text className={styles.clubBooksEmptyText}>暂无共追作品</Text>
+                    </View>
+                  )}
                 </View>
               </View>
             ))}

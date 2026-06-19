@@ -1,48 +1,34 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, Image, Button } from '@tarojs/components';
-import Taro, { useRouter, useDidShow } from '@tarojs/taro';
+import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
 import Tag from '@/components/Tag';
-import { getBookById } from '@/data/books';
+import SelectClubModal from '@/components/SelectClubModal';
+import { useAppStore } from '@/store/useAppStore';
 import type { Book } from '@/types';
 import styles from './index.module.scss';
 
 const BookDetailPage: React.FC = () => {
   const router = useRouter();
   const bookId = router.params.id || '1';
+  const book = useAppStore(state => state.books.find(b => b.id === bookId)) as Book;
+  const { toggleShelf, updateChapter } = useAppStore();
 
-  const [book, setBook] = useState<Book | null>(null);
-  const [currentChapter, setCurrentChapter] = useState(1);
-  const [isInShelf, setIsInShelf] = useState(false);
-
-  const loadBook = useCallback(() => {
-    const data = getBookById(bookId);
-    if (data) {
-      setBook(data);
-      setCurrentChapter(data.currentChapter);
-      setIsInShelf(data.isInShelf);
-    }
-  }, [bookId]);
-
-  useDidShow(() => {
-    loadBook();
-  });
-
-  useEffect(() => {
-    loadBook();
-  }, [loadBook]);
+  const [currentChapter, setCurrentChapter] = useState(book?.currentChapter || 1);
+  const [showClubModal, setShowClubModal] = useState(false);
 
   const handleChapterChange = (delta: number) => {
     if (!book) return;
     const newChapter = Math.min(book.totalChapters, Math.max(1, currentChapter + delta));
     setCurrentChapter(newChapter);
+    updateChapter(bookId, newChapter);
   };
 
   const handleToggleShelf = () => {
-    setIsInShelf(prev => !prev);
+    toggleShelf(bookId);
     Taro.showToast({
-      title: isInShelf ? '已移出书架' : '已加入书架',
-      icon: 'success'
+      title: book?.isInShelf ? '已移出书架' : '已加入书架',
+      icon: book?.isInShelf ? 'none' : 'success'
     });
   };
 
@@ -54,10 +40,14 @@ const BookDetailPage: React.FC = () => {
   };
 
   const handleJoinClub = () => {
-    Taro.showToast({
-      title: '加入书友会功能',
-      icon: 'none'
-    });
+    if (!book?.isInShelf) {
+      Taro.showToast({
+        title: '请先将作品加入书架',
+        icon: 'none'
+      });
+      return;
+    }
+    setShowClubModal(true);
   };
 
   const formatNumber = (num: number): string => {
@@ -177,14 +167,20 @@ const BookDetailPage: React.FC = () => {
 
       <View className={styles.bottomBar}>
         <Button
-          className={classnames(styles.shelfBtn, isInShelf ? styles.inShelf : styles.addShelf)}
+          className={classnames(styles.shelfBtn, book?.isInShelf ? styles.inShelf : styles.addShelf)}
           onClick={handleToggleShelf}
         >
           <Text className={styles.shelfBtnText}>
-            {isInShelf ? '✓ 已在书架' : '+ 加入书架'}
+            {book?.isInShelf ? '✓ 已在书架' : '+ 加入书架'}
           </Text>
         </Button>
       </View>
+
+      <SelectClubModal
+        visible={showClubModal}
+        bookId={bookId}
+        onClose={() => setShowClubModal(false)}
+      />
     </View>
   );
 };

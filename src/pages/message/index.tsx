@@ -1,54 +1,50 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text } from '@tarojs/components';
-import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro';
+import { View, Text, Button } from '@tarojs/components';
+import Taro, { usePullDownRefresh } from '@tarojs/taro';
 import classnames from 'classnames';
 import ResponseCard from '@/components/ResponseCard';
 import Empty from '@/components/Empty';
-import { mockResponses } from '@/data/responses';
-import type { AuthorResponse } from '@/types';
+import CreateResponseModal from '@/components/CreateResponseModal';
+import { useAppStore } from '@/store/useAppStore';
 import styles from './index.module.scss';
 
 type TabType = 'response' | 'system';
 
 const MessagePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('response');
-  const [responses, setResponses] = useState<AuthorResponse[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const loadData = useCallback(() => {
+  const { responses, markResponseRead, markAllResponsesRead } = useAppStore();
+
+  const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      setResponses([...mockResponses]);
       setLoading(false);
       Taro.stopPullDownRefresh();
     }, 300);
   }, []);
 
-  useDidShow(() => {
-    loadData();
-  });
-
   usePullDownRefresh(() => {
-    loadData();
+    handleRefresh();
   });
 
   const unreadCount = responses.filter(r => !r.isRead).length;
 
   const handleResponseClick = (id: string) => {
-    setResponses(prev => prev.map(r => {
-      if (r.id === id) {
-        return { ...r, isRead: true };
-      }
-      return r;
-    }));
+    markResponseRead(id);
   };
 
   const handleMarkAll = () => {
-    setResponses(prev => prev.map(r => ({ ...r, isRead: true })));
+    markAllResponsesRead();
     Taro.showToast({
       title: '已全部标为已读',
       icon: 'success'
     });
+  };
+
+  const handleCreateResponse = () => {
+    setShowCreateModal(true);
   };
 
   const systemMessages = [
@@ -99,11 +95,16 @@ const MessagePage: React.FC = () => {
 
       {activeTab === 'response' && (
         <>
-          {responses.length > 0 && (
-            <View className={styles.markAll} onClick={handleMarkAll}>
-              <Text className={styles.markAllText}>全部标为已读</Text>
+          <View className={styles.headerActions}>
+            {responses.length > 0 && (
+              <View className={styles.markAll} onClick={handleMarkAll}>
+                <Text className={styles.markAllText}>全部标为已读</Text>
+              </View>
+            )}
+            <View className={styles.publishBtn} onClick={handleCreateResponse}>
+              <Text className={styles.publishBtnText}>发布回应</Text>
             </View>
-          )}
+          </View>
           {responses.length > 0 ? (
             <View className={styles.list}>
               {responses.map(response => (
@@ -142,6 +143,11 @@ const MessagePage: React.FC = () => {
           ))}
         </View>
       )}
+
+      <CreateResponseModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
     </View>
   );
 };

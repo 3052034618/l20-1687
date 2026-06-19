@@ -1,50 +1,38 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, Button } from '@tarojs/components';
-import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro';
+import Taro, { usePullDownRefresh } from '@tarojs/taro';
 import classnames from 'classnames';
 import UrgeCard from '@/components/UrgeCard';
 import Empty from '@/components/Empty';
-import { mockUrgeTasks } from '@/data/urges';
-import type { UrgeTask } from '@/types';
+import CreateUrgeModal from '@/components/CreateUrgeModal';
+import { useAppStore } from '@/store/useAppStore';
 import styles from './index.module.scss';
 
 type TabType = 'active' | 'completed';
 
 const SurgePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('active');
-  const [tasks, setTasks] = useState<UrgeTask[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const loadData = useCallback(() => {
+  const { urgeTasks, joinUrge } = useAppStore();
+
+  const handleRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      setTasks([...mockUrgeTasks]);
       setLoading(false);
       Taro.stopPullDownRefresh();
     }, 300);
   }, []);
 
-  useDidShow(() => {
-    loadData();
-  });
-
   usePullDownRefresh(() => {
-    loadData();
+    handleRefresh();
   });
 
   const handleJoin = (taskId: string) => {
-    setTasks(prev => prev.map(task => {
-      if (task.id === taskId && !task.hasJoined && task.status === 'active') {
-        const newCount = task.currentCount + 1;
-        return {
-          ...task,
-          hasJoined: true,
-          currentCount: newCount,
-          status: newCount >= task.targetCount ? 'completed' : task.status
-        };
-      }
-      return task;
-    }));
+    const task = urgeTasks.find(t => t.id === taskId);
+    if (!task || task.hasJoined || task.status !== 'active') return;
+    joinUrge(taskId);
     Taro.showToast({
       title: '已参与催更',
       icon: 'success',
@@ -59,20 +47,17 @@ const SurgePage: React.FC = () => {
   };
 
   const handleCreate = () => {
-    Taro.showToast({
-      title: '发起催更功能',
-      icon: 'none'
-    });
+    setShowCreateModal(true);
   };
 
-  const filteredTasks = tasks.filter(task => {
+  const filteredTasks = urgeTasks.filter(task => {
     if (activeTab === 'active') {
       return task.status === 'active';
     }
     return task.status === 'completed';
   });
 
-  const activeCount = tasks.filter(t => t.status === 'active').length;
+  const activeCount = urgeTasks.filter(t => t.status === 'active').length;
 
   return (
     <View className={styles.page}>
@@ -125,6 +110,11 @@ const SurgePage: React.FC = () => {
         <Text className={styles.createBtnIcon}>✏️</Text>
         <Text className={styles.createBtnText}>发起</Text>
       </Button>
+
+      <CreateUrgeModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
     </View>
   );
 };

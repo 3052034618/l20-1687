@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, Image, Button } from '@tarojs/components';
-import Taro, { useRouter, useDidShow } from '@tarojs/taro';
+import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
-import { getUrgeTaskById, getUrgeParticipants } from '@/data/urges';
+import { getUrgeParticipants } from '@/data/urges';
 import { updateTypeMap } from '@/types';
+import { useAppStore } from '@/store/useAppStore';
 import type { UrgeTask, UrgeParticipant } from '@/types';
 import styles from './index.module.scss';
 
@@ -11,42 +12,23 @@ const UrgeDetailPage: React.FC = () => {
   const router = useRouter();
   const taskId = router.params.id || '1';
 
-  const [task, setTask] = useState<UrgeTask | null>(null);
+  const task = useAppStore(state => state.urgeTasks.find(t => t.id === taskId)) as UrgeTask;
+  const { joinUrge } = useAppStore();
   const [participants, setParticipants] = useState<UrgeParticipant[]>([]);
 
-  const loadData = useCallback(() => {
-    const taskData = getUrgeTaskById(taskId);
-    if (taskData) {
-      setTask(taskData);
-    }
+  React.useEffect(() => {
     setParticipants(getUrgeParticipants(taskId));
   }, [taskId]);
 
-  useDidShow(() => {
-    loadData();
-  });
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  const handleJoin = () => {
+  const handleJoin = useCallback(() => {
     if (!task || task.status !== 'active' || task.hasJoined) return;
-
-    const newCount = task.currentCount + 1;
-    setTask({
-      ...task,
-      hasJoined: true,
-      currentCount: newCount,
-      status: newCount >= task.targetCount ? 'completed' : task.status
-    });
-
+    joinUrge(taskId);
     Taro.showToast({
       title: '已参与催更',
       icon: 'success',
       duration: 1500
     });
-  };
+  }, [task, taskId, joinUrge]);
 
   if (!task) {
     return null;

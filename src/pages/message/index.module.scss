@@ -80,15 +80,32 @@
   padding: 120rpx 0;
 }
 
+.headerActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 $page-padding $spacing-sm;
+}
+
 .markAll {
   display: flex;
-  justify-content: flex-end;
-  padding: 0 $page-padding $spacing-sm;
 }
 
 .markAllText {
   font-size: $font-size-sm;
   color: $color-secondary;
+}
+
+.publishBtn {
+  padding: 8rpx 20rpx;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  border-radius: $radius-button;
+}
+
+.publishBtnText {
+  font-size: $font-size-sm;
+  color: #fff;
+  font-weight: $font-weight-medium;
 }
 
 .systemItem {

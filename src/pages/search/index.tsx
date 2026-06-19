@@ -1,24 +1,28 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, Image, Input, Button } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { searchBooks, mockBooks } from '@/data/books';
 import Empty from '@/components/Empty';
 import Tag from '@/components/Tag';
+import { useAppStore } from '@/store/useAppStore';
 import type { Book } from '@/types';
 import styles from './index.module.scss';
 
 const SearchPage: React.FC = () => {
+  const { books, toggleShelf } = useAppStore();
   const [keyword, setKeyword] = useState('');
   const [results, setResults] = useState<Book[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const [shelfBooks, setShelfBooks] = useState<string[]>([]);
-
-  useEffect(() => {
-    const shelfIds = mockBooks.filter(b => b.isInShelf).map(b => b.id);
-    setShelfBooks(shelfIds);
-  }, []);
 
   const hotKeywords = ['星河彼岸', '长安月', '黎明之剑', '修仙', '科幻', '古风', '美食', '机甲'];
+
+  const searchBooks = (kw: string): Book[] => {
+    const lowerKw = kw.toLowerCase();
+    return books.filter(
+      b => b.title.toLowerCase().includes(lowerKw) ||
+           b.author.toLowerCase().includes(lowerKw) ||
+           b.category.toLowerCase().includes(lowerKw)
+    );
+  };
 
   const handleSearch = useCallback(() => {
     if (!keyword.trim()) {
@@ -26,32 +30,24 @@ const SearchPage: React.FC = () => {
       setHasSearched(false);
       return;
     }
-    const books = searchBooks(keyword);
-    setResults(books);
+    const foundBooks = searchBooks(keyword);
+    setResults(foundBooks);
     setHasSearched(true);
-  }, [keyword]);
+  }, [keyword, books]);
 
   const handleKeywordClick = (word: string) => {
     setKeyword(word);
-    const books = searchBooks(word);
-    setResults(books);
+    const foundBooks = searchBooks(word);
+    setResults(foundBooks);
     setHasSearched(true);
   };
 
   const handleAddShelf = (book: Book) => {
-    if (shelfBooks.includes(book.id)) {
-      setShelfBooks(prev => prev.filter(id => id !== book.id));
-      Taro.showToast({
-        title: '已移出书架',
-        icon: 'none'
-      });
-    } else {
-      setShelfBooks(prev => [...prev, book.id]);
-      Taro.showToast({
-        title: '已加入书架',
-        icon: 'success'
-      });
-    }
+    toggleShelf(book.id);
+    Taro.showToast({
+      title: book.isInShelf ? '已移出书架' : '已加入书架',
+      icon: book.isInShelf ? 'none' : 'success'
+    });
   };
 
   const goToDetail = (id: string) => {
@@ -129,14 +125,14 @@ const SearchPage: React.FC = () => {
                         <Tag text={book.category} size="sm" />
                       </View>
                       <Button
-                        className={shelfBooks.includes(book.id) ? styles.addedBtn : styles.addBtn}
+                        className={book.isInShelf ? styles.addedBtn : styles.addBtn}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddShelf(book);
                         }}
                       >
-                        <Text className={shelfBooks.includes(book.id) ? styles.addedBtnText : styles.addBtnText}>
-                          {shelfBooks.includes(book.id) ? '已加入' : '+ 书架'}
+                        <Text className={book.isInShelf ? styles.addedBtnText : styles.addBtnText}>
+                          {book.isInShelf ? '已加入' : '+ 书架'}
                         </Text>
                       </Button>
                     </View>

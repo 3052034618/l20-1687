@@ -1,23 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
-import Taro, { useDidShow } from '@tarojs/taro';
-import { getJoinedBookClubs } from '@/data/bookclubs';
-import { getShelfBooks } from '@/data/books';
-import type { BookClub } from '@/types';
+import Taro from '@tarojs/taro';
+import { useAppStore } from '@/store/useAppStore';
 import styles from './index.module.scss';
 
 const MinePage: React.FC = () => {
-  const [bookClubs, setBookClubs] = useState<BookClub[]>([]);
-
-  const loadData = useCallback(() => {
-    setBookClubs(getJoinedBookClubs());
-  }, []);
-
-  useDidShow(() => {
-    loadData();
-  });
-
-  const shelfBooks = getShelfBooks();
+  const bookClubs = useAppStore(state => state.bookClubs.filter(c => c.isJoined));
+  const shelfBooks = useAppStore(state => state.books.filter(b => b.isInShelf));
+  const urgeTasks = useAppStore(state => state.urgeTasks);
+  const joinedUrgeCount = urgeTasks.filter(t => t.hasJoined).length;
+  const completedUrgeCount = urgeTasks.filter(t => t.status === 'completed' && t.hasJoined).length;
 
   const menuItems = [
     { icon: '📝', title: '我的催更记录', key: 'urge-record' },
@@ -57,11 +49,11 @@ const MinePage: React.FC = () => {
           <Text className={styles.statLabel}>追更中</Text>
         </View>
         <View className={styles.statItem}>
-          <Text className={styles.statNumber}>5</Text>
+          <Text className={styles.statNumber}>{joinedUrgeCount}</Text>
           <Text className={styles.statLabel}>催更次数</Text>
         </View>
         <View className={styles.statItem}>
-          <Text className={styles.statNumber}>2</Text>
+          <Text className={styles.statNumber}>{completedUrgeCount}</Text>
           <Text className={styles.statLabel}>达成催更</Text>
         </View>
       </View>

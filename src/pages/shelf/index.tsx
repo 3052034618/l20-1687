@@ -31,15 +31,15 @@ const ShelfPage: React.FC = () => {
   };
 
   const goToSearch = () => {
-    Taro.navigateTo({
-      url: '/pages/search/index'
-    });
+    Taro.navigateTo({ url: '/pages/search/index' });
   };
 
-  const goToBookDetail = (id: string) => {
-    Taro.navigateTo({
-      url: `/pages/book-detail/index?id=${id}`
-    });
+  const goToBookDetail = (bookId: string) => {
+    Taro.navigateTo({ url: `/pages/book-detail/index?id=${bookId}` });
+  };
+
+  const goToClubBooks = (clubId: string) => {
+    Taro.navigateTo({ url: `/pages/club-books/index?id=${clubId}` });
   };
 
   return (
@@ -63,7 +63,7 @@ const ShelfPage: React.FC = () => {
           </View>
           <ScrollView scrollX className={styles.clubScroll} enhanced showScrollbar={false}>
             {bookClubs.map(club => (
-              <View key={club.id} className={styles.clubCard}>
+              <View key={club.id} className={styles.clubCard} onClick={() => goToClubBooks(club.id)}>
                 <View className={styles.clubHeader}>
                   <Image
                     className={styles.clubAvatar}

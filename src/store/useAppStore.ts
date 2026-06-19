@@ -14,16 +14,19 @@ interface AppState {
   toggleShelf: (bookId: string) => void;
   updateChapter: (bookId: string, chapter: number) => void;
   addBookToClub: (bookId: string, clubId: string) => void;
-  joinUrge: (taskId: string) => void;
+  joinUrge: (taskId: string, message?: string) => void;
   createUrgeTask: (task: Omit<UrgeTask, 'id' | 'currentCount' | 'status' | 'hasJoined' | 'createdAt'>) => void;
   createResponse: (response: Omit<AuthorResponse, 'id' | 'createdAt' | 'isRead'>) => void;
   markResponseRead: (responseId: string) => void;
   markAllResponsesRead: () => void;
+  markTaskResponded: (taskId: string) => void;
   getBookById: (bookId: string) => Book | undefined;
   getShelfBooks: () => Book[];
   getClubBooks: (clubId: string) => Book[];
   getJoinedClubs: () => BookClub[];
   getUrgeParticipants: (taskId: string) => UrgeParticipant[];
+  getResponsesForTask: (taskId: string) => AuthorResponse[];
+  getUrgeTasksForBook: (bookId: string) => UrgeTask[];
 }
 
 const initialParticipants: Record<string, UrgeParticipant[]> = {};
@@ -83,8 +86,8 @@ export const useAppStore = create<AppState>()(
     });
   },
 
-  joinUrge: (taskId: string) => {
-    console.log('[Store] joinUrge:', taskId);
+  joinUrge: (taskId: string, message?: string) => {
+    console.log('[Store] joinUrge:', taskId, message);
     set(state => {
       const newParticipants = { ...state.urgeParticipants };
       if (!newParticipants[taskId]) {
@@ -110,7 +113,7 @@ export const useAppStore = create<AppState>()(
           hour: '2-digit',
           minute: '2-digit'
         }).replace(/\//g, '-'),
-        message: '催更+1'
+        message: message || '催更+1'
       };
 
       newParticipants[taskId] = [newParticipant, ...newParticipants[taskId]];
@@ -159,9 +162,20 @@ export const useAppStore = create<AppState>()(
       }).replace(/\//g, '-'),
       isRead: false
     };
-    set(state => ({
-      responses: [newResponse, ...state.responses]
-    }));
+    set(state => {
+      const newState: Partial<AppState> = {
+        responses: [newResponse, ...state.responses]
+      };
+      if (responseData.urgeTaskId) {
+        newState.urgeTasks = state.urgeTasks.map(t => {
+          if (t.id === responseData.urgeTaskId && t.status !== 'responded') {
+            return { ...t, status: 'responded' as const };
+          }
+          return t;
+        });
+      }
+      return newState;
+    });
   },
 
   markResponseRead: (responseId: string) => {
@@ -199,6 +213,23 @@ export const useAppStore = create<AppState>()(
 
   getUrgeParticipants: (taskId: string) => {
     return get().urgeParticipants[taskId] || [];
+  },
+
+  markTaskResponded: (taskId: string) => {
+    console.log('[Store] markTaskResponded:', taskId);
+    set(state => ({
+      urgeTasks: state.urgeTasks.map(t =>
+        t.id === taskId ? { ...t, status: 'responded' as const } : t
+      )
+    }));
+  },
+
+  getResponsesForTask: (taskId: string) => {
+    return get().responses.filter(r => r.urgeTaskId === taskId);
+  },
+
+  getUrgeTasksForBook: (bookId: string) => {
+    return get().urgeTasks.filter(t => t.bookId === bookId);
   }
 }),
     {

@@ -6,7 +6,8 @@ export default defineAppConfig({
     'pages/mine/index',
     'pages/search/index',
     'pages/book-detail/index',
-    'pages/urge-detail/index'
+    'pages/urge-detail/index',
+    'pages/club-books/index'
   ],
   window: {
     backgroundTextStyle: 'light',

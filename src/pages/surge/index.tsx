@@ -8,7 +8,7 @@ import CreateUrgeModal from '@/components/CreateUrgeModal';
 import { useAppStore } from '@/store/useAppStore';
 import styles from './index.module.scss';
 
-type TabType = 'active' | 'completed';
+type TabType = 'active' | 'completed' | 'responded';
 
 const SurgePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('active');
@@ -51,13 +51,13 @@ const SurgePage: React.FC = () => {
   };
 
   const filteredTasks = urgeTasks.filter(task => {
-    if (activeTab === 'active') {
-      return task.status === 'active';
-    }
-    return task.status === 'completed';
+    if (activeTab === 'active') return task.status === 'active';
+    if (activeTab === 'completed') return task.status === 'completed';
+    return task.status === 'responded';
   });
 
   const activeCount = urgeTasks.filter(t => t.status === 'active').length;
+  const respondedCount = urgeTasks.filter(t => t.status === 'responded').length;
 
   return (
     <View className={styles.page}>
@@ -84,6 +84,17 @@ const SurgePage: React.FC = () => {
         >
           <Text className={styles.tabText}>已达成</Text>
         </View>
+        <View
+          className={classnames(styles.tabItem, activeTab === 'responded' && styles.active)}
+          onClick={() => setActiveTab('responded')}
+        >
+          <Text className={styles.tabText}>已回应</Text>
+          {respondedCount > 0 && (
+            <View className={styles.tabBadge}>
+              <Text className={styles.tabBadgeText}>{respondedCount}</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       {filteredTasks.length > 0 ? (
@@ -100,7 +111,7 @@ const SurgePage: React.FC = () => {
       ) : (
         <View className={styles.empty}>
           <Empty
-            text={activeTab === 'active' ? '暂无进行中的催更' : '暂无已达成的催更'}
+            text={activeTab === 'active' ? '暂无进行中的催更' : activeTab === 'responded' ? '暂无已回应的催更' : '暂无已达成的催更'}
             description="快去发起第一个催更吧~"
           />
         </View>

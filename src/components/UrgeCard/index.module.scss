@@ -164,3 +164,19 @@
   font-size: $font-size-xs;
   color: $color-secondary;
 }
+
+.respondedTag {
+  width: 100%;
+  height: $button-height-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+  border-radius: $radius-button;
+}
+
+.respondedTagText {
+  font-size: $font-size-md;
+  color: #fff;
+  font-weight: $font-weight-medium;
+}

@@ -35,12 +35,14 @@ const UrgeCard: React.FC<UrgeCardProps> = ({ task, onJoin, onClick }) => {
   };
 
   const statusTagType = () => {
+    if (task.status === 'responded') return 'secondary';
     if (task.status === 'completed') return 'success';
     if (task.hasJoined) return 'primary';
     return 'default';
   };
 
   const statusText = () => {
+    if (task.status === 'responded') return '已回应';
     if (task.status === 'completed') return '已达成';
     if (task.hasJoined) return '已参与';
     return '催更中';
@@ -83,7 +85,7 @@ const UrgeCard: React.FC<UrgeCardProps> = ({ task, onJoin, onClick }) => {
           percent={progressPercent}
           showText={false}
           size="md"
-          color={task.status === 'completed' ? 'success' : 'primary'}
+          color={task.status === 'responded' ? 'success' : task.status === 'completed' ? 'success' : 'primary'}
         />
       </View>
 
@@ -97,6 +99,14 @@ const UrgeCard: React.FC<UrgeCardProps> = ({ task, onJoin, onClick }) => {
               {task.hasJoined ? '已参与催更' : '参与催更'}
             </Text>
           </Button>
+        </View>
+      )}
+
+      {task.status === 'responded' && (
+        <View className={styles.actionSection}>
+          <View className={styles.respondedTag}>
+            <Text className={styles.respondedTagText}>✍️ 作者已回应</Text>
+          </View>
         </View>
       )}
 

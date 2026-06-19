@@ -15,13 +15,17 @@ interface CreateResponseModalProps {
 const statuses: ResponseStatus[] = ['writing', 'tonight', 'leave', 'thank'];
 
 const CreateResponseModal: React.FC<CreateResponseModalProps> = ({ visible, onClose }) => {
-  const { books, createResponse, getShelfBooks } = useAppStore();
+  const { books, createResponse, getShelfBooks, urgeTasks } = useAppStore();
   
   const [selectedBook, setSelectedBook] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<ResponseStatus>('writing');
   const [message, setMessage] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState('');
 
   const shelfBooks = getShelfBooks();
+  const bookUrgeTasks = selectedBook
+    ? urgeTasks.filter(t => t.bookId === selectedBook && (t.status === 'active' || t.status === 'completed'))
+    : [];
 
   const handleSubmit = () => {
     if (!selectedBook) {
@@ -44,7 +48,8 @@ const CreateResponseModal: React.FC<CreateResponseModalProps> = ({ visible, onCl
       authorAvatar: 'https://picsum.photos/id/1005/200/200',
       status: selectedStatus,
       statusText: responseStatusMap[selectedStatus],
-      message: message.trim()
+      message: message.trim(),
+      urgeTaskId: selectedTaskId || undefined
     });
 
     Taro.showToast({ title: '回应已发布', icon: 'success' });
@@ -55,6 +60,7 @@ const CreateResponseModal: React.FC<CreateResponseModalProps> = ({ visible, onCl
     setSelectedBook('');
     setSelectedStatus('writing');
     setMessage('');
+    setSelectedTaskId('');
     onClose();
   };
 
@@ -114,6 +120,26 @@ const CreateResponseModal: React.FC<CreateResponseModalProps> = ({ visible, onCl
               ))}
             </View>
           </View>
+
+          {bookUrgeTasks.length > 0 && (
+            <View className={styles.section}>
+              <Text className={styles.label}>关联催更任务（可选）</Text>
+              <View className={styles.taskList}>
+                {bookUrgeTasks.map(task => (
+                  <View
+                    key={task.id}
+                    className={classnames(styles.taskItem, selectedTaskId === task.id && styles.selectedTask)}
+                    onClick={() => setSelectedTaskId(selectedTaskId === task.id ? '' : task.id)}
+                  >
+                    <Text className={styles.taskText}>
+                      {task.message.length > 15 ? task.message.slice(0, 15) + '...' : task.message}
+                    </Text>
+                    <Text className={styles.taskCount}>{task.currentCount}/{task.targetCount}人</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
           <View className={styles.section}>
             <Text className={styles.label}>回应内容</Text>

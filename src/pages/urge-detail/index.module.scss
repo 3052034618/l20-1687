@@ -3,7 +3,7 @@
 .page {
   min-height: 100vh;
   background-color: $color-bg-page;
-  padding-bottom: 140rpx;
+  padding-bottom: 160rpx;
 }
 
 .header {
@@ -43,10 +43,24 @@
   padding: 4rpx 16rpx;
   background-color: rgba(255, 255, 255, 0.25);
   border-radius: $radius-round;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-sm;
 }
 
 .updateTypeText {
+  font-size: $font-size-xs;
+  color: #fff;
+}
+
+.respondedTag {
+  display: inline-flex;
+  padding: 4rpx 16rpx;
+  background-color: rgba(91, 143, 185, 0.6);
+  border-radius: $radius-round;
+  margin-bottom: $spacing-sm;
+  margin-left: $spacing-xs;
+}
+
+.respondedTagText {
   font-size: $font-size-xs;
   color: #fff;
 }
@@ -102,10 +116,10 @@
   color: $color-text-secondary;
 }
 
-.progressCount strong {
+.progressNum {
   color: $color-primary;
-  font-size: $font-size-lg;
   font-weight: $font-weight-bold;
+  font-size: $font-size-lg;
 }
 
 .progressBar {
@@ -122,6 +136,14 @@
   background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
   border-radius: $radius-round;
   transition: width $transition-base ease;
+}
+
+.progressFillResponded {
+  background: linear-gradient(90deg, $color-secondary 0%, $color-secondary-light 100%);
+}
+
+.progressFillCompleted {
+  background: linear-gradient(90deg, $color-success 0%, #7DD9A0 100%);
 }
 
 .progressTip {
@@ -167,6 +189,106 @@
 .deadlineValue {
   font-size: $font-size-sm;
   color: $color-text-secondary;
+}
+
+.responseCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.responseItem {
+  padding: $spacing-md 0;
+  border-bottom: 2rpx solid $color-divider;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.responseHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.responseAvatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.responseInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.responseName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.responseTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.responseStatus {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+
+  &.status_writing {
+    background-color: $color-primary-bg;
+  }
+
+  &.status_tonight {
+    background-color: rgba(91, 143, 185, 0.15);
+  }
+
+  &.status_leave {
+    background-color: rgba(255, 193, 7, 0.15);
+  }
+
+  &.status_thank {
+    background-color: rgba(76, 175, 80, 0.15);
+  }
+}
+
+.responseStatusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  .status_writing & {
+    color: $color-primary-dark;
+  }
+
+  .status_tonight & {
+    color: $color-secondary;
+  }
+
+  .status_leave & {
+    color: #F9A825;
+  }
+
+  .status_thank & {
+    color: $color-success;
+  }
+}
+
+.responseMessage {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
 }
 
 .participantsCard {
@@ -233,33 +355,13 @@
 
 .joinBtn {
   @include button-reset;
-  width: 100%;
   height: $button-height-lg;
   border-radius: $radius-button;
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
-  transition: all $transition-base;
 
   &:active {
     transform: scale(0.98);
   }
-}
-
-.joinedBtn {
-  @include button-reset;
-  width: 100%;
-  height: $button-height-lg;
-  border-radius: $radius-button;
-  background-color: $color-success;
-  transition: all $transition-base;
-}
-
-.completedBtn {
-  @include button-reset;
-  width: 100%;
-  height: $button-height-lg;
-  border-radius: $radius-button;
-  background-color: $color-secondary-bg;
-  transition: all $transition-base;
 }
 
 .joinBtnText {
@@ -268,8 +370,86 @@
   font-weight: $font-weight-semibold;
 }
 
+.joinedBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background-color: $color-success;
+}
+
+.completedBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background-color: $color-secondary-bg;
+}
+
 .completedBtnText {
   font-size: $font-size-md;
   color: $color-secondary;
   font-weight: $font-weight-medium;
+}
+
+.respondedBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+}
+
+.respondedBtnText {
+  font-size: $font-size-md;
+  color: #fff;
+  font-weight: $font-weight-medium;
+}
+
+.joinActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.joinActions .joinBtn {
+  flex: 2;
+}
+
+.joinQuickBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background-color: $color-bg-tag;
+  border: 2rpx solid $color-primary;
+}
+
+.joinQuickText {
+  font-size: $font-size-md;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.joinWithComment {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: center;
+}
+
+.commentInput {
+  flex: 1;
+  height: $button-height-lg;
+  padding: 0 $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.joinSubmitBtn {
+  @include button-reset;
+  height: $button-height-lg;
+  padding: 0 40rpx;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
 }

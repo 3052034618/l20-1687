@@ -31,7 +31,7 @@ export interface UrgeTask {
   message: string;
   deadline: string;
   createdAt: string;
-  status: 'active' | 'completed' | 'expired';
+  status: 'active' | 'completed' | 'expired' | 'responded';
   hasJoined: boolean;
   bookClubName?: string;
 }
@@ -49,6 +49,7 @@ export interface AuthorResponse {
   message: string;
   createdAt: string;
   isRead: boolean;
+  urgeTaskId?: string;
 }
 
 // 书友会
@@ -65,6 +66,7 @@ export interface BookClub {
 // 催更参与记录
 export interface UrgeParticipant {
   id: string;
+  taskId: string;
   userId: string;
   userName: string;
   userAvatar: string;

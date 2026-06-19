@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
-import { View, Text, Image, Button } from '@tarojs/components';
+import React, { useState, useCallback } from 'react';
+import { View, Text, Image, Button, Input } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import classnames from 'classnames';
-import { updateTypeMap } from '@/types';
+import { updateTypeMap, responseStatusMap } from '@/types';
 import { useAppStore } from '@/store/useAppStore';
-import type { UrgeTask, UrgeParticipant } from '@/types';
+import type { UrgeTask, UrgeParticipant, AuthorResponse } from '@/types';
 import styles from './index.module.scss';
 
 const UrgeDetailPage: React.FC = () => {
@@ -13,24 +13,37 @@ const UrgeDetailPage: React.FC = () => {
 
   const task = useAppStore(state => state.urgeTasks.find(t => t.id === taskId)) as UrgeTask;
   const participants = useAppStore(state => state.getUrgeParticipants(taskId));
+  const taskResponses = useAppStore(state => state.getResponsesForTask(taskId));
   const { joinUrge } = useAppStore();
+
+  const [commentInput, setCommentInput] = useState('');
+  const [showJoinWithComment, setShowJoinWithComment] = useState(false);
 
   const handleJoin = useCallback(() => {
     if (!task || task.status !== 'active' || task.hasJoined) return;
-    joinUrge(taskId);
+    const msg = commentInput.trim() || undefined;
+    joinUrge(taskId, msg);
+    setCommentInput('');
+    setShowJoinWithComment(false);
     Taro.showToast({
       title: '已参与催更',
       icon: 'success',
       duration: 1500
     });
-  }, [task, taskId, joinUrge]);
+  }, [task, taskId, joinUrge, commentInput]);
 
   if (!task) {
     return null;
   }
 
-  const progressPercent = Math.round((task.currentCount / task.targetCount) * 100);
+  const progressPercent = Math.min(100, Math.round((task.currentCount / task.targetCount) * 100));
   const remaining = task.targetCount - task.currentCount;
+
+  const statusText = () => {
+    if (task.status === 'responded') return '✍️ 作者已回应';
+    if (task.status === 'completed') return '🎉 目标已达成';
+    return `还差 ${remaining} 人达成目标`;
+  };
 
   return (
     <View className={styles.page}>
@@ -44,6 +57,11 @@ const UrgeDetailPage: React.FC = () => {
                 催更类型：{updateTypeMap[task.updateType]}
               </Text>
             </View>
+            {task.status === 'responded' && (
+              <View className={styles.respondedTag}>
+                <Text className={styles.respondedTagText}>✍️ 作者已回应</Text>
+              </View>
+            )}
             <View className={styles.initiator}>
               <Image
                 className={styles.initiatorAvatar}
@@ -62,25 +80,25 @@ const UrgeDetailPage: React.FC = () => {
             <View className={styles.progressHeader}>
               <Text className={styles.progressLabel}>催更进度</Text>
               <Text className={styles.progressCount}>
-                <Text>{task.currentCount}</Text> / {task.targetCount}人
+                <Text className={styles.progressNum}>{task.currentCount}</Text> / {task.targetCount}人
               </Text>
             </View>
             <View className={styles.progressBar}>
               <View
-                className={styles.progressFill}
+                className={classnames(
+                  styles.progressFill,
+                  task.status === 'responded' && styles.progressFillResponded,
+                  task.status === 'completed' && styles.progressFillCompleted
+                )}
                 style={{ width: `${progressPercent}%` }}
               />
             </View>
-            <Text className={styles.progressTip}>
-              {task.status === 'completed'
-                ? '🎉 催更目标已达成！'
-                : `还差 ${remaining} 人达成目标`}
-            </Text>
+            <Text className={styles.progressTip}>{statusText()}</Text>
           </View>
         </View>
 
         <View className={styles.messageCard}>
-          <Text className={styles.sectionTitle}>💬 催更留言</Text>
+          <Text className={styles.sectionTitle}>💬 催更话术</Text>
           <Text className={styles.messageText}>{task.message}</Text>
           <View className={styles.deadlineInfo}>
             <Text className={styles.deadlineLabel}>发起时间</Text>
@@ -98,9 +116,34 @@ const UrgeDetailPage: React.FC = () => {
           )}
         </View>
 
+        {taskResponses.length > 0 && (
+          <View className={styles.responseCard}>
+            <Text className={styles.sectionTitle}>✍️ 作者回应</Text>
+            {taskResponses.map(resp => (
+              <View key={resp.id} className={styles.responseItem}>
+                <View className={styles.responseHeader}>
+                  <Image
+                    className={styles.responseAvatar}
+                    src={resp.authorAvatar}
+                    mode="aspectFill"
+                  />
+                  <View className={styles.responseInfo}>
+                    <Text className={styles.responseName}>{resp.authorName}</Text>
+                    <Text className={styles.responseTime}>{resp.createdAt}</Text>
+                  </View>
+                  <View className={classnames(styles.responseStatus, styles[`status_${resp.status}`])}>
+                    <Text className={styles.responseStatusText}>{resp.statusText}</Text>
+                  </View>
+                </View>
+                <Text className={styles.responseMessage}>{resp.message}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
         <View className={styles.participantsCard}>
           <Text className={styles.sectionTitle}>
-            👥 参与催更的书友 ({task?.currentCount || 0})
+            👥 参与催更的书友 ({task.currentCount})
           </Text>
           <View className={styles.participantList}>
             {participants.map(p => (
@@ -124,19 +167,41 @@ const UrgeDetailPage: React.FC = () => {
       </View>
 
       <View className={styles.bottomBar}>
-        {task.status === 'completed' ? (
+        {task.status === 'responded' ? (
+          <Button className={styles.respondedBtn} disabled>
+            <Text className={styles.respondedBtnText}>✍️ 作者已回应</Text>
+          </Button>
+        ) : task.status === 'completed' ? (
           <Button className={styles.completedBtn} disabled>
             <Text className={styles.completedBtnText}>🎉 催更已达成</Text>
           </Button>
-        ) : (
-          <Button
-            className={task.hasJoined ? styles.joinedBtn : styles.joinBtn}
-            onClick={handleJoin}
-          >
-            <Text className={styles.joinBtnText}>
-              {task.hasJoined ? '✓ 已参与催更' : '参与催更'}
-            </Text>
+        ) : task.hasJoined ? (
+          <Button className={styles.joinedBtn} disabled>
+            <Text className={styles.joinBtnText}>✓ 已参与催更</Text>
           </Button>
+        ) : showJoinWithComment ? (
+          <View className={styles.joinWithComment}>
+            <Input
+              className={styles.commentInput}
+              type="text"
+              value={commentInput}
+              onInput={e => setCommentInput(e.detail.value)}
+              placeholder="留一句话给作者加油~"
+              placeholderTextColor="#A09A94"
+            />
+            <Button className={styles.joinSubmitBtn} onClick={handleJoin}>
+              <Text className={styles.joinBtnText}>参与</Text>
+            </Button>
+          </View>
+        ) : (
+          <View className={styles.joinActions}>
+            <Button className={styles.joinBtn} onClick={() => setShowJoinWithComment(true)}>
+              <Text className={styles.joinBtnText}>💬 留言参与</Text>
+            </Button>
+            <Button className={styles.joinQuickBtn} onClick={handleJoin}>
+              <Text className={styles.joinQuickText}>快速参与</Text>
+            </Button>
+          </View>
         )}
       </View>
     </View>

@@ -25,6 +25,7 @@
   background-color: $color-bg-card;
   border-radius: $radius-button;
   transition: all $transition-base;
+  position: relative;
 }
 
 .tabText {
@@ -105,4 +106,25 @@
 .hotCount {
   color: $color-error;
   font-weight: $font-weight-bold;
+}
+
+.tabBadge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  background-color: $color-secondary;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tabBadgeText {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: $font-weight-medium;
+  line-height: 1;
 }

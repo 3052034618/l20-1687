@@ -1,0 +1,145 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+}
+
+.header {
+  position: relative;
+  padding: 48rpx $page-padding $spacing-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: 0 0 $radius-xl $radius-xl;
+}
+
+.greeting {
+  margin-bottom: $spacing-md;
+}
+
+.greetingText {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: #fff;
+  margin-bottom: 8rpx;
+}
+
+.subGreeting {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  height: 80rpx;
+  padding: 0 $spacing-md;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: $radius-button;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.searchIcon {
+  font-size: 32rpx;
+}
+
+.searchText {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.section {
+  padding: $spacing-lg $page-padding 0;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionMore {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.clubScroll {
+  margin: 0 (-$page-padding);
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-sm;
+}
+
+.clubCard {
+  @include scroll-x-item(280rpx);
+  margin-right: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  vertical-align: top;
+}
+
+.clubHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.clubAvatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+}
+
+.clubInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.clubName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.clubCount {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+}
+
+.clubBooks {
+  display: flex;
+  gap: 8rpx;
+}
+
+.clubBookCover {
+  width: 72rpx;
+  height: 96rpx;
+  border-radius: $radius-xs;
+}
+
+.bookList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.emptyTip {
+  text-align: center;
+  padding: $spacing-xl * 2 0;
+}
+
+.emptyTipText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

@@ -1,0 +1,102 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  position: relative;
+  padding: $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &.unread {
+    background: linear-gradient(135deg, #FFF9F3 0%, $color-bg-card 60%);
+  }
+}
+
+.unreadDot {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  width: 16rpx;
+  height: 16rpx;
+  background-color: $color-error;
+  border-radius: $radius-round;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.authorInfo {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.authorAvatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.authorMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+  flex: 1;
+}
+
+.authorName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.bookName {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.message {
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  border-left: 6rpx solid $color-primary-light;
+}
+
+.messageText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bookCover {
+  width: 80rpx;
+  height: 100rpx;
+  border-radius: $radius-xs;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

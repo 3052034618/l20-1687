@@ -1,0 +1,146 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: none;
+  }
+}
+
+.coverWrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 180rpx;
+  height: 240rpx;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.cover {
+  width: 100%;
+  height: 100%;
+}
+
+.updateBadge {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  padding: 4rpx 10rpx;
+  border-radius: $radius-xs;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.updateText {
+  font-size: 20rpx;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.today {
+  background-color: rgba(255, 140, 66, 0.9);
+}
+
+.recent {
+  background-color: rgba(0, 180, 42, 0.85);
+}
+
+.normal {
+  background-color: rgba(91, 143, 185, 0.85);
+}
+
+.slow {
+  background-color: rgba(160, 154, 148, 0.85);
+}
+
+.paused {
+  background-color: rgba(245, 63, 63, 0.85);
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 8rpx;
+  @include text-ellipsis;
+}
+
+.author {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis;
+}
+
+.progressSection {
+  margin-bottom: $spacing-sm;
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.progressText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.progressPercent {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-primary;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8rpx;
+  background-color: $color-bg-tag;
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-round;
+  transition: width $transition-base ease;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-top: auto;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.metaIcon {
+  font-size: 22rpx;
+}
+
+.metaText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

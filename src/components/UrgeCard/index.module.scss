@@ -1,0 +1,166 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  padding: $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-md;
+}
+
+.bookInfo {
+  display: flex;
+  gap: $spacing-md;
+  flex: 1;
+  min-width: 0;
+}
+
+.bookCover {
+  width: 100rpx;
+  height: 130rpx;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.bookMeta {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  min-width: 0;
+  flex: 1;
+}
+
+.bookTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.tags {
+  display: flex;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+
+.initiator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: $spacing-md;
+}
+
+.initiatorAvatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  margin-bottom: 4rpx;
+}
+
+.initiatorName {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+  max-width: 100rpx;
+  text-align: center;
+}
+
+.message {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(2);
+}
+
+.progressSection {
+  margin-bottom: $spacing-md;
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.countText {
+  font-size: $font-size-sm;
+}
+
+.currentCount {
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  font-size: $font-size-md;
+}
+
+.targetCount {
+  color: $color-text-tertiary;
+}
+
+.deadline {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.actionSection {
+  margin-bottom: $spacing-md;
+}
+
+.joinBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-md;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+
+  &.joined {
+    background: $color-primary-bg;
+    border: 2rpx solid $color-primary-light;
+  }
+}
+
+.joinBtnText {
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+
+  .joined & {
+    color: $color-primary-dark;
+  }
+}
+
+.clubInfo {
+  display: flex;
+  align-items: center;
+  padding-top: $spacing-md;
+  border-top: 2rpx solid $color-divider;
+}
+
+.clubLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.clubName {
+  font-size: $font-size-xs;
+  color: $color-secondary;
+}

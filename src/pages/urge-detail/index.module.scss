@@ -3,7 +3,7 @@
 .page {
   min-height: 100vh;
   background-color: $color-bg-page;
-  padding-bottom: 160rpx;
+  padding-bottom: 180rpx;
 }
 
 .header {
@@ -38,12 +38,18 @@
   @include text-ellipsis;
 }
 
+.tagRow {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-sm;
+  flex-wrap: wrap;
+}
+
 .updateType {
   display: inline-flex;
   padding: 4rpx 16rpx;
   background-color: rgba(255, 255, 255, 0.25);
   border-radius: $radius-round;
-  margin-bottom: $spacing-sm;
 }
 
 .updateTypeText {
@@ -54,10 +60,8 @@
 .respondedTag {
   display: inline-flex;
   padding: 4rpx 16rpx;
-  background-color: rgba(91, 143, 185, 0.6);
+  background-color: rgba(91, 143, 185, 0.7);
   border-radius: $radius-round;
-  margin-bottom: $spacing-sm;
-  margin-left: $spacing-xs;
 }
 
 .respondedTagText {
@@ -86,16 +90,15 @@
   padding: $page-padding;
 }
 
-.progressCard {
+.progressCard,
+.messageCard,
+.responseCard,
+.participantsCard {
   background-color: $color-bg-card;
   border-radius: $radius-lg;
   padding: $spacing-lg;
   margin-bottom: $spacing-md;
   box-shadow: $shadow-card;
-}
-
-.progressSection {
-  margin-bottom: $spacing-lg;
 }
 
 .progressHeader {
@@ -136,28 +139,20 @@
   background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
   border-radius: $radius-round;
   transition: width $transition-base ease;
-}
 
-.progressFillResponded {
-  background: linear-gradient(90deg, $color-secondary 0%, $color-secondary-light 100%);
-}
+  &.progressFillResponded {
+    background: linear-gradient(90deg, $color-secondary 0%, $color-secondary-light 100%);
+  }
 
-.progressFillCompleted {
-  background: linear-gradient(90deg, $color-success 0%, #7DD9A0 100%);
+  &.progressFillCompleted {
+    background: linear-gradient(90deg, $color-success 0%, #7DD9A0 100%);
+  }
 }
 
 .progressTip {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
   text-align: right;
-}
-
-.messageCard {
-  background-color: $color-bg-card;
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-md;
-  box-shadow: $shadow-card;
 }
 
 .sectionTitle {
@@ -189,14 +184,6 @@
 .deadlineValue {
   font-size: $font-size-sm;
   color: $color-text-secondary;
-}
-
-.responseCard {
-  background-color: $color-bg-card;
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-md;
-  box-shadow: $shadow-card;
 }
 
 .responseItem {
@@ -268,21 +255,10 @@
   font-size: $font-size-xs;
   font-weight: $font-weight-medium;
 
-  .status_writing & {
-    color: $color-primary-dark;
-  }
-
-  .status_tonight & {
-    color: $color-secondary;
-  }
-
-  .status_leave & {
-    color: #F9A825;
-  }
-
-  .status_thank & {
-    color: $color-success;
-  }
+  .status_writing & { color: $color-primary-dark; }
+  .status_tonight & { color: $color-secondary; }
+  .status_leave & { color: #F9A825; }
+  .status_thank & { color: $color-success; }
 }
 
 .responseMessage {
@@ -291,11 +267,39 @@
   line-height: $line-height-normal;
 }
 
-.participantsCard {
-  background-color: $color-bg-card;
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  box-shadow: $shadow-card;
+.participantsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.sortBar {
+  display: flex;
+  background-color: $color-bg-tag;
+  border-radius: $radius-button;
+  padding: 4rpx;
+}
+
+.sortItem {
+  padding: 8rpx 20rpx;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &.sortActive {
+    background-color: $color-bg-card;
+    box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.08);
+  }
+}
+
+.sortText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+
+  .sortActive & {
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
 }
 
 .participantList {
@@ -306,15 +310,50 @@
 
 .participantItem {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
   gap: $spacing-sm;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+
+  &.myItem {
+    background-color: $color-primary-bg;
+    border: 2rpx solid $color-primary-light;
+  }
+}
+
+.participantLeft {
+  display: flex;
+  gap: $spacing-sm;
+  flex: 1;
+  min-width: 0;
+}
+
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .participantAvatar {
   width: 72rpx;
   height: 72rpx;
   border-radius: $radius-round;
-  flex-shrink: 0;
+}
+
+.myBadge {
+  position: absolute;
+  bottom: -4rpx;
+  right: -4rpx;
+  width: 32rpx;
+  height: 32rpx;
+  background-color: $color-primary;
+  color: #fff;
+  border-radius: $radius-round;
+  font-size: 20rpx;
+  line-height: 32rpx;
+  text-align: center;
+  border: 2rpx solid #fff;
+  font-weight: $font-weight-bold;
 }
 
 .participantInfo {
@@ -322,23 +361,82 @@
   min-width: 0;
 }
 
+.participantNameRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: 4rpx;
+}
+
 .participantName {
   font-size: $font-size-md;
   color: $color-text-primary;
   font-weight: $font-weight-medium;
-  margin-bottom: 4rpx;
+}
+
+.meTag {
+  padding: 2rpx 10rpx;
+  background-color: $color-primary;
+  border-radius: $radius-xs;
+}
+
+.meTagText {
+  font-size: 18rpx;
+  color: #fff;
+  font-weight: $font-weight-medium;
+  line-height: 1.2;
 }
 
 .participantMessage {
   font-size: $font-size-sm;
   color: $color-text-tertiary;
   @include text-ellipsis;
+
+  &.myMessage {
+    color: $color-primary-dark;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.participantRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $spacing-xs;
+  flex-shrink: 0;
 }
 
 .participantTime {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
-  flex-shrink: 0;
+}
+
+.likeBtn {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 6rpx 12rpx;
+  background-color: $color-bg-tag;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &.liked {
+    background-color: rgba(255, 107, 107, 0.1);
+  }
+}
+
+.likeIcon {
+  font-size: 24rpx;
+}
+
+.likeCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+
+  .liked & {
+    color: #FF6B6B;
+    font-weight: $font-weight-medium;
+  }
 }
 
 .bottomBar {
@@ -409,10 +507,10 @@
 .joinActions {
   display: flex;
   gap: $spacing-sm;
-}
 
-.joinActions .joinBtn {
-  flex: 2;
+  .joinBtn {
+    flex: 2;
+  }
 }
 
 .joinQuickBtn {

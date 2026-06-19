@@ -286,3 +286,245 @@
   color: #fff;
   font-weight: $font-weight-medium;
 }
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+
+  .sectionTitle {
+    margin-bottom: 0;
+  }
+}
+
+.sectionCount {
+  min-width: 40rpx;
+  height: 40rpx;
+  padding: 0 12rpx;
+  border-radius: $radius-round;
+  background-color: $color-primary-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sectionCountText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.activeUrgeCard {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-primary-bg;
+  border-radius: $radius-md;
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  border-left: 6rpx solid $color-primary;
+}
+
+.urgeCardLeft {
+  flex-shrink: 0;
+  width: 160rpx;
+}
+
+.urgeProgressWrap {
+  position: relative;
+}
+
+.urgeProgressBar {
+  width: 100%;
+  height: 20rpx;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.urgeProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-round;
+
+  &.fillResponded {
+    background: linear-gradient(90deg, $color-secondary 0%, $color-secondary-light 100%);
+  }
+}
+
+.urgeProgressText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: $color-primary-dark;
+  margin-top: 8rpx;
+  text-align: center;
+  display: block;
+}
+
+.urgeCardRight {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.urgeCardMsg {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  @include text-ellipsis;
+}
+
+.urgeCardArrow {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.responseList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.responseItem {
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  border-left: 4rpx solid $color-secondary;
+}
+
+.responseHeader {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: flex-start;
+  margin-bottom: $spacing-sm;
+}
+
+.responseAvatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.responseMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.responseTopRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+  margin-bottom: 4rpx;
+}
+
+.responseName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.scopeTag {
+  padding: 2rpx 12rpx;
+  border-radius: $radius-xs;
+
+  &.scopeUrge {
+    background-color: $color-primary-bg;
+  }
+
+  &.scopeGeneral {
+    background-color: rgba(96, 125, 139, 0.12);
+  }
+}
+
+.scopeTagText {
+  font-size: 20rpx;
+  font-weight: $font-weight-medium;
+
+  .scopeUrge & { color: $color-primary-dark; }
+  .scopeGeneral & { color: #607D8B; }
+}
+
+.responseTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.responseStatus {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+
+  &.status_writing {
+    background-color: $color-primary-bg;
+  }
+  &.status_tonight {
+    background-color: rgba(91, 143, 185, 0.15);
+  }
+  &.status_leave {
+    background-color: rgba(255, 193, 7, 0.15);
+  }
+  &.status_thank {
+    background-color: rgba(76, 175, 80, 0.15);
+  }
+}
+
+.responseStatusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  .status_writing & { color: $color-primary-dark; }
+  .status_tonight & { color: $color-secondary; }
+  .status_leave & { color: #F9A825; }
+  .status_thank & { color: $color-success; }
+}
+
+.responseContent {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-normal;
+  padding: $spacing-sm 0;
+  border-top: 2rpx solid $color-divider;
+}
+
+.assocUrge {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background-color: $color-primary-bg;
+  border-radius: $radius-button;
+}
+
+.assocUrgeText {
+  font-size: $font-size-xs;
+  color: $color-primary-dark;
+  font-weight: $font-weight-medium;
+}
+
+.emptyResponse {
+  padding: $spacing-xl 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.emptyResponseIcon {
+  font-size: 64rpx;
+  opacity: 0.6;
+}
+
+.emptyResponseText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.emptyResponseDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

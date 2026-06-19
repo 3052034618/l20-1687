@@ -12,10 +12,15 @@ const BookDetailPage: React.FC = () => {
   const router = useRouter();
   const bookId = router.params.id || '1';
   const book = useAppStore(state => state.books.find(b => b.id === bookId)) as Book;
-  const { toggleShelf, updateChapter } = useAppStore();
+  const { toggleShelf, updateChapter, getResponsesForBook, getUrgeTasksForBook } = useAppStore();
 
   const [currentChapter, setCurrentChapter] = useState(book?.currentChapter || 1);
   const [showClubModal, setShowClubModal] = useState(false);
+
+  const bookResponses = getResponsesForBook(bookId);
+  const bookUrgeTasks = getUrgeTasksForBook(bookId);
+  const activeUrge = bookUrgeTasks.find(t => t.status === 'active')
+    || bookUrgeTasks.find(t => t.status === 'responded');
 
   const handleChapterChange = (delta: number) => {
     if (!book) return;
@@ -33,8 +38,9 @@ const BookDetailPage: React.FC = () => {
   };
 
   const handleUrge = () => {
+    Taro.switchTab({ url: '/pages/surge/index' });
     Taro.showToast({
-      title: '发起催更功能',
+      title: '去催更广场发起',
       icon: 'none'
     });
   };
@@ -48,6 +54,10 @@ const BookDetailPage: React.FC = () => {
       return;
     }
     setShowClubModal(true);
+  };
+
+  const goToUrgeDetail = (taskId: string) => {
+    Taro.navigateTo({ url: `/pages/urge-detail/index?id=${taskId}` });
   };
 
   const formatNumber = (num: number): string => {
@@ -162,6 +172,103 @@ const BookDetailPage: React.FC = () => {
               <Text className={styles.clubBtnText}>加入书友会</Text>
             </Button>
           </View>
+          {activeUrge && (
+            <View className={styles.activeUrgeCard} onClick={() => goToUrgeDetail(activeUrge.id)}>
+              <View className={styles.urgeCardLeft}>
+                <View className={styles.urgeProgressWrap}>
+                  <View className={styles.urgeProgressBar}>
+                    <View
+                      className={classnames(
+                        styles.urgeProgressFill,
+                        activeUrge.status === 'responded' && styles.fillResponded
+                      )}
+                      style={{ width: `${Math.min(100, Math.round((activeUrge.currentCount / activeUrge.targetCount) * 100))}%` }}
+                    />
+                  </View>
+                  <Text className={styles.urgeProgressText}>
+                    {activeUrge.status === 'responded' ? '已回应' : `${activeUrge.currentCount}/${activeUrge.targetCount}`}
+                  </Text>
+                </View>
+              </View>
+              <View className={styles.urgeCardRight}>
+                <Text className={styles.urgeCardMsg}>
+                  {activeUrge.message.length > 20 ? activeUrge.message.slice(0, 20) + '...' : activeUrge.message}
+                </Text>
+                <Text className={styles.urgeCardArrow}>查看催更详情 →</Text>
+              </View>
+            </View>
+          )}
+        </View>
+
+        <View className={styles.section}>
+          <View className={styles.sectionHeader}>
+            <Text className={styles.sectionTitle}>
+              <Text className={styles.sectionTitleIcon}>✍️</Text>
+              作者动态
+            </Text>
+            {bookResponses.length > 0 && (
+              <View className={styles.sectionCount}>
+                <Text className={styles.sectionCountText}>{bookResponses.length}</Text>
+              </View>
+            )}
+          </View>
+
+          {bookResponses.length > 0 ? (
+            <View className={styles.responseList}>
+              {bookResponses.map(resp => (
+                <View key={resp.id} className={styles.responseItem}>
+                  <View className={styles.responseHeader}>
+                    <Image
+                      className={styles.responseAvatar}
+                      src={resp.authorAvatar}
+                      mode="aspectFill"
+                    />
+                    <View className={styles.responseMeta}>
+                      <View className={styles.responseTopRow}>
+                        <Text className={styles.responseName}>{resp.authorName}</Text>
+                        <View
+                          className={classnames(
+                            styles.scopeTag,
+                            resp.scope === 'urge_task' ? styles.scopeUrge : styles.scopeGeneral
+                          )}
+                        >
+                          <Text className={styles.scopeTagText}>
+                            {resp.scope === 'urge_task' ? '催更回应' : '作者公告'}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text className={styles.responseTime}>{resp.createdAt}</Text>
+                    </View>
+                    <View
+                      className={classnames(
+                        styles.responseStatus,
+                        styles[`status_${resp.status}`]
+                      )}
+                    >
+                      <Text className={styles.responseStatusText}>{resp.statusText}</Text>
+                    </View>
+                  </View>
+                  <Text className={styles.responseContent}>{resp.message}</Text>
+                  {resp.scope === 'urge_task' && resp.urgeTaskId && (
+                    <View
+                      className={styles.assocUrge}
+                      onClick={() => goToUrgeDetail(resp.urgeTaskId as string)}
+                    >
+                      <Text className={styles.assocUrgeText}>
+                        🎯 关联催更任务 · 点击查看催更详情 →
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View className={styles.emptyResponse}>
+              <Text className={styles.emptyResponseIcon}>💭</Text>
+              <Text className={styles.emptyResponseText}>暂无作者动态</Text>
+              <Text className={styles.emptyResponseDesc}>关注作者或加入催更，第一时间获取更新</Text>
+            </View>
+          )}
         </View>
       </View>
 

@@ -72,7 +72,31 @@ export interface UrgeParticipant {
   userAvatar: string;
   joinedAt: string;
   message?: string;
+  likeCount?: number;
+  likedByMe?: boolean;
 }
+
+// 书友会动态
+export interface ClubActivity {
+  id: string;
+  clubId: string;
+  type: 'join_club' | 'add_book' | 'urge' | 'urge_complete' | 'author_response' | 'member_comment';
+  bookId?: string;
+  bookTitle?: string;
+  bookCover?: string;
+  urgeTaskId?: string;
+  urgeMessage?: string;
+  responseId?: string;
+  responseStatus?: string;
+  responseStatusText?: string;
+  content: string;
+  userName: string;
+  userAvatar: string;
+  createdAt: string;
+}
+
+// 作者回应关联范围
+export type ResponseScope = 'general' | 'urge_task';
 
 // 更新类型
 export type UpdateType = 'chapter' | 'extra' | 'ending' | 'illustration';
